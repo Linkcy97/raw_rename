@@ -3,11 +3,19 @@
 # Email        : lichongyang2016@163.com
 # Date         : 2025-05-06 08:17:44
 # LastEditors  : Chongyang Li
-# LastEditTime : 2025-05-09 22:09:59
+# LastEditTime : 2025-05-10 14:45:28
 # FilePath     : \raw_rename\Raw_rename.py
 
 import shutil
 from pathlib import Path
+import re 
+
+def extract_data_from_folder_name(folder_name):
+    # 使用正则表达式提取数字部分
+    match = re.search(r'\d+', folder_name)
+    if match:
+        return match.group()  # 返回匹配到的数字部分
+    return None
 
 def move_and_rename_files(folder_path):
     folder = Path(folder_path)
@@ -46,8 +54,10 @@ def move_and_rename_files(folder_path):
             for name in unmatched_raws:
                 print(name)
         return
-                
-    prefix = input("请输入重命名前缀，如 changsha20250500:\n")
+    auto_prefix = extract_data_from_folder_name(folder.name)            
+    prefix = input("请输入重命名前缀，否则以默认形式%s:\n" % auto_prefix)
+    if not prefix:
+        prefix = auto_prefix
     # 动态生成目标文件夹名称：原文件夹名称加下划线加 raw
     raw_folder_name = f"{folder.name}_raw"
     raw_folder = folder / raw_folder_name
