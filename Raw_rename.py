@@ -3,7 +3,7 @@
 # Email        : lichongyang2016@163.com
 # Date         : 2025-05-06 08:17:44
 # LastEditors  : Chongyang Li
-# LastEditTime : 2025-05-10 14:45:28
+# LastEditTime : 2025-05-10 15:12:07
 # FilePath     : \raw_rename\Raw_rename.py
 
 import shutil
@@ -41,19 +41,34 @@ def move_and_rename_files(folder_path):
         jpg_names = {file.stem for file in jpg_files}
         raw_names = {file.stem for file in raw_files}
 
-        unmatched_jpgs = [file.name for file in jpg_files if file.stem not in raw_names]
-        unmatched_raws = [file.name for file in raw_files if file.stem not in jpg_names]
+        unmatched_jpgs = [file for file in jpg_files if file.stem not in raw_names]
+        unmatched_raws = [file for file in raw_files if file.stem not in jpg_names]
 
         if unmatched_jpgs:
             print("未匹配的 JPG 文件:")
-            for name in unmatched_jpgs:
-                print(name)
+            for file in unmatched_jpgs:
+                print(file.name)
 
         if unmatched_raws:
             print("未匹配的 RAW 文件:")
-            for name in unmatched_raws:
-                print(name)
-        return
+            for file in unmatched_raws:
+                print(file.name)
+
+        # 提示用户是否删除未匹配的文件
+        user_choice = input("是否删除未匹配的文件并继续？输入 Y 删除，输入 N 退出:\n").strip().upper()
+        if user_choice == 'Y':
+            for file in unmatched_jpgs:
+                file.unlink()  # 删除未匹配的 JPG 文件
+                jpg_files.remove(file)  # 从 jpg_files 列表中移除
+                print(f"已删除未匹配的 JPG 文件: {file.name}")
+            for file in unmatched_raws:
+                file.unlink()  # 删除未匹配的 RAW 文件
+                raw_files.remove(file)  # 从 raw_files 列表中移除
+                print(f"已删除未匹配的 RAW 文件: {file.name}")
+        else:
+            print("操作已取消。")
+            return
+
     auto_prefix = extract_data_from_folder_name(folder.name)            
     prefix = input("请输入重命名前缀，否则以默认形式%s:\n" % auto_prefix)
     if not prefix:
